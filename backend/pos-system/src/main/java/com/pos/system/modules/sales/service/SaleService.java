@@ -2,10 +2,14 @@ package com.pos.system.modules.sales.service;
 
 import com.pos.system.modules.auth.entity.User;
 import com.pos.system.modules.auth.repository.UserRepository;
+import com.pos.system.modules.sales.dto.SaleRequestDTO;
 import com.pos.system.modules.inventory.entity.Product;
 import com.pos.system.modules.inventory.repository.ProductRepository;
 import com.pos.system.modules.sales.dto.CartItemDTO;
-import com.pos.system.modules.sales.dto.SaleRequestDTO;
+import com.pos.system.modules.sales.dto.PaymentDTO;
+import com.pos.system.modules.sales.entity.CardPayment;
+import com.pos.system.modules.sales.entity.CashPayment;
+import com.pos.system.modules.sales.entity.Payment;
 import com.pos.system.modules.sales.entity.Sale;
 import com.pos.system.modules.sales.entity.SaleItem;
 import com.pos.system.modules.sales.repository.SaleRepository;
@@ -14,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
+import java.util.ArrayList;
 @Service
 public class SaleService {
 
@@ -68,6 +72,45 @@ public class SaleService {
         }
 
         sale.setTotalAmount(totalAmount);
+
+        // --- PAYMENT LOGIC (New) ---
+        BigDecimal totalPaid = BigDecimal.ZERO;
+
+        // If payments are provided
+        if (request.getPayments() != null) {
+            // Initialize list if null in entity
+            if (sale.getPayments() == null) sale.setPayments(new ArrayList<>());
+
+            for (PaymentDTO pDto : request.getPayments()) {
+                Payment payment;
+
+                if ("CASH".equalsIgnoreCase(pDto.getType())) {
+                    CashPayment cp = new CashPayment();
+                    cp.setCashTendered(pDto.getCashTendered());
+                    // Calculate change: Tendered - Amount
+                    if (pDto.getCashTendered() != null) {
+                        cp.setChangeGiven(pDto.getCashTendered().subtract(pDto.getAmount()));
+                    }
+                    payment = cp;
+                } else {
+                    CardPayment cp = new CardPayment();
+                    cp.setCardLastFourDigits(pDto.getCardLastFour());
+                    payment = cp;
+                }
+
+                payment.setAmount(pDto.getAmount());
+                payment.setSale(sale); // Link to parent
+                sale.getPayments().add(payment); // Add to list
+
+                totalPaid = totalPaid.add(pDto.getAmount());
+            }
+
+            // Validation: Did they pay enough?
+            if (totalPaid.compareTo(totalAmount) < 0) {
+                throw new RuntimeException("Insufficient Payment! Total Due: " + totalAmount + ", Paid: " + totalPaid);
+            }
+        }
+
         return saleRepository.save(sale);
     }
 }

@@ -36,6 +36,10 @@ public class Sale {
     // Relationship: One Sale has many Items
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleItem> items = new ArrayList<>();
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
+    private List<Payment> payments = new ArrayList<>();
+    public List<Payment> getPayments() { return payments; }
+    public void setPayments(List<Payment> payments) { this.payments = payments; }
 
     // --- MANUAL GETTERS & SETTERS ---
     public Long getId() { return id; }
