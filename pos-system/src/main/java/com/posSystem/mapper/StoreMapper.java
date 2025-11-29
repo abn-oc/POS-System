@@ -9,7 +9,7 @@ public class StoreMapper {
     public static StoreDto toDTO(Store store) {
         StoreDto storeDto = new StoreDto();
         storeDto.setId(store.getId());
-        storeDto.setBranchName(store.getBranchName());
+        storeDto.setBranchName(store.getBrand());
         storeDto.setDescription(store.getDescription());
         storeDto.setStoreAdmin(UserMapper.toDTO(store.getStoreAdmin()));
         storeDto.setStoreType(store.getStoreType());
@@ -23,7 +23,7 @@ public class StoreMapper {
     public static Store toEntity(StoreDto storeDto, User storeAdmin) {
         Store store = new Store();
         store.setId(storeDto.getId());
-        store.setBranchName(storeDto.getBranchName());
+        store.setBrand(storeDto.getBranchName());
         store.setDescription(storeDto.getDescription());
         store.setStoreAdmin(storeAdmin);
         store.setStoreType(storeDto.getStoreType());

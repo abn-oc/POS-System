@@ -62,7 +62,7 @@ public class StoreServiceImpl implements StoreService {
         if (existing == null) {
                 throw new Exception("Store not Found");
             }
-        existing.setBranchName(storeDto.getBranchName());
+        existing.setBrand(storeDto.getBranchName());
         existing.setDescription(storeDto.getDescription());
 
         if (storeDto.getStoreType() != null) {
