@@ -1,0 +1,33 @@
+package com.posSystem.payload.dto;
+
+import com.posSystem.models.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
+import lombok.Builder;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+public class ShiftReportDto {
+    private Long id;
+    private LocalDateTime shiftStart;
+    private LocalDateTime endShift;
+    private Double totalSales;
+    private Double totalRefunds;
+    private Double netSale;
+    private Double totalOrders;
+    private Long cashierId;
+    private UserDto cashier;
+    private BranchDto branch;
+    private Long branchId;
+    private List<ProductDto> topSellingProducts;
+    private List<OrderDto> recentOrders;
+    private List<RefundDto> refunds;
+    private List<PaymentSummary> paymentSummaries;
+
+}
